@@ -7,5 +7,5 @@ select
     customer_id,
     event_type,
     product_id,
-    event_timestamp
+    cast(event_timestamp as timestamp) as event_ts
 from {{ ref('events') }}
