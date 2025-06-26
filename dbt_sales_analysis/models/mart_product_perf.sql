@@ -1,5 +1,3 @@
--- models/mart_product_perf.sql
-
 {{ config(materialized='table') }}
 
 with funnel as (
@@ -14,23 +12,29 @@ products as (
     select * from {{ ref('stg_products') }}
 ),
 
-joined as (
-  select
-    p.product_id,
-    p.product_name,
-    p.category,
-    count(distinct f.customer_id)              as nb_clients_vus,
-    count(distinct o.order_id)                 as nb_commandes,
-    sum(o.quantity)                            as qt_vendue,
-    round(sum(o.quantity * p.price), 2)        as ca_total,
-    count(*) filter (where f.cart_ts is not null and f.purchase_ts is null) as nb_abandons
-  from products p
-  left join funnel f on using(product_id)
-  left join orders o on using(product_id)
-  group by 1, 2, 3
+agg as (
+    select
+        p.product_id,
+        p.product_name,
+        p.category,
+
+        count(distinct f.customer_id)                                         as nb_clients_vus,
+        count(distinct o.order_id)                                            as nb_commandes,
+        sum(o.quantity)                                                       as qt_vendue,
+        sum(o.quantity * p.price)                                             as ca_total,
+        sum(case
+                when f.cart_ts is not null and f.purchase_ts is null then 1
+                else 0
+            end)                                                              as nb_abandons
+    from products p
+    left join funnel  f on p.product_id = f.product_id
+    left join orders  o on p.product_id = o.product_id
+    group by p.product_id, p.product_name, p.category
 )
 
-select *,
-       round(nb_commandes::float / nullif(nb_clients_vus,0),2)        as taux_conversion,
-       round(nb_abandons::float  / nullif(nb_clients_vus,0),2)        as taux_abandon
-from joined;
+select
+    *,
+    safe_divide(nb_commandes, nb_clients_vus)                                 as taux_conversion,
+    safe_divide(nb_abandons , nb_clients_vus)                                 as taux_abandon
+from agg
+order by ca_total desc
