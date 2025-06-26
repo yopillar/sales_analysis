@@ -61,3 +61,28 @@ models:
           - dbt_utils.accepted_range:
               min_value: 0
               max_value: 1
+
+  - name: mart_category_ranking
+    description: >
+      Classement quotidien du chiffre d'affaires par catégorie produit.
+      Le champ `ca_rank` émule un podium dynamique : 1 = meilleur CA du jour,
+      2 = deuxième, 3 = troisième, etc.
+    columns:
+      - name: order_date
+        description: "Date (YYYY-MM-DD) de l'agrégation."
+        tests: [not_null]
+      - name: category
+        description: "Catégorie fonctionnelle du produit."
+        tests: [not_null]
+      - name: ca_total
+        description: "Chiffre d'affaires total de la catégorie pour la journée, en euros."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0           # jamais négatif
+      - name: ca_rank
+        description: "Rang de la catégorie pour la journée (1 = plus gros CA)."
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1           # au moins 1

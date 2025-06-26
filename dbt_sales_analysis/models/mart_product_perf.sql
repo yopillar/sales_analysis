@@ -17,7 +17,7 @@ agg as (
         p.product_id,
         p.product_name,
         p.category,
-
+        order_date,
         count(distinct f.customer_id)                                         as nb_clients_vus,
         count(distinct o.order_id)                                            as nb_commandes,
         sum(o.quantity)                                                       as qt_vendue,
@@ -29,7 +29,7 @@ agg as (
     from products p
     left join funnel  f on p.product_id = f.product_id
     left join orders  o on p.product_id = o.product_id
-    group by p.product_id, p.product_name, p.category
+    group by p.product_id, p.product_name, p.category, order_date
 )
 
 select
