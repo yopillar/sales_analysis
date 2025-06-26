@@ -32,3 +32,4 @@ joined as (
 select *,
     round(nb_commandes::float / nullif(nb_clients_vus, 0), 2) as taux_conversion
 from joined
+order by taux_conversion desc

@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: stg_products
+    description: "Produits nettoyés"
+    columns:
+      - name: product_id
+        description: "Identifiant produit unique"
+        tests: [unique, not_null]
+      - name: category
+        description: "Catégorie fonctionnelle déclarée"
+      - name: price
+        description: "Prix unitaire TTC"
+        tests:
+          - not_null
+          - accepted_range:
+              min_value: 0
+
+  - name: stg_orders
+    description: "Commandes clients nettoyées"
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: quantity
+        tests:
+          - not_null
+          - accepted_range:
+              min_value: 1
+              config: { severity: warn }
+
+  - name: stg_events
+    description: "Événements clients"
+    columns:
+      - name: event_id
+        tests: [unique, not_null]
+      - name: event_type
+        tests:
+          - not_null
+          - accepted_values: { values: ['view','add_to_cart','remove_from_cart','checkout','purchase'] }
+
+  - name: int_funnel
+    description: "Parcours client par (customer_id, product_id)."
+    columns:
+      - name: customer_id
+        tests: [not_null]
+      - name: product_id
+        tests: [not_null]
+
+  - name: mart_product_perf
+    description: "KPIs produit : CA, conversions, volumes."
+    columns:
+      - name: product_id
+        tests: [not_null]
+      - name: taux_conversion
+        description: "nb_commandes / nb_clients_vus"
+        tests:
+          - not_null
+          - accepted_range:
+              min_value: 0
+              max_value: 1
