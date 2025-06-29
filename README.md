@@ -82,7 +82,7 @@ Le modèle `mart_product_perf` est exposé dans Looker Studio via BigQuery pour 
 
 **Lien vers le rapport public :**  
 [Rapport Looker Studio – Product 360°](https://lookerstudio.google.com/s/sal_t8YHOEI)
-
+![Dashboard Looker](looker/Dashboardlooker.png)
 ---
 
 ## Reproduire le projet
@@ -124,15 +124,6 @@ dbt seed
 dbt run
 dbt test
 ``` 
-
----
-
-## Pourquoi ce projet ?
-
-- Il applique les bonnes pratiques de modélisation `stg / int / mart`.
-- Il intègre la documentation et les tests qualité.
-- Il est entièrement basé sur des outils gratuits en cloud (BigQuery, dbt, Looker).
-- Il est reproductible, clair et facile à lire pour des recruteurs ou collègues.
 
 ---
 
